@@ -8,6 +8,7 @@ usersRouter.get('/', async (request, response) => {
 
   response.json(users)
 })
+
 usersRouter.post('/', async (request, response) => {
   const body = request.body
   if(body.password.length < 3){
@@ -25,6 +26,16 @@ usersRouter.post('/', async (request, response) => {
   const savedUser = await user.save()
 
   response.json(savedUser)
+})
+
+usersRouter.put("/:id", async (request, response) => {
+  const body = request.body
+  user = {
+    consent: body.consent
+  }
+  const updatedUser = await User.findByIdAndUpdate(request.params.id, user, {new:true})
+
+  response.json(updatedUser)
 })
 
 module.exports = usersRouter

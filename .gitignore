@@ -3,6 +3,9 @@
 # dependencies
 /node_modules
 
+# requests
+/requests
+
 
 # misc
 .DS_Store

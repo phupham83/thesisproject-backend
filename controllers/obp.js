@@ -5,6 +5,7 @@ const oauth = require("oauth")
 const { response } = require("express")
 const util = require('util')
 const { request } = require("http")
+const User = require('../models/user')
 
 const _openbankConsumerKey = config.consumerKey
 const _openbankConsumerSecret = config.consumerSecret
@@ -50,19 +51,20 @@ obpRouter.get("/callback", (request, response) => {
             response.status(500).send("Error getting OAuth access token : " + util.inspect(error));
           } else {
             //error is now undefined
-            request.session.oauthAccessToken = oauthAccessToken;
-            request.session.oauthAccessTokenSecret = oauthAccessTokenSecret;
-            response.redirect('signed_in');
+            request.session.oauthAccessToken = oauthAccessToken
+            request.session.oauthAccessTokenSecret = oauthAccessTokenSecret
+            response.end("Saved token")
           }
         }
       )
 })
 
 
-obpRouter.get("/getMyAccounts", (request, response) =>{
+obpRouter.get("/getMyAccounts/:id", async (request, response) =>{
+    const user = await User.findById(request.params.id)
     consumer.get(apiHost + "/obp/v3.0.0/my/accounts",
-    request.session.oauthAccessToken,
-    request.session.oauthAccessTokenSecret,
+    user.consent[0],
+    user.consent[1],
     (error, data, res) => {
         try {
             response.json(data)
@@ -72,7 +74,12 @@ obpRouter.get("/getMyAccounts", (request, response) =>{
     })
 })
 
-obpRouter.get("/signed_in", (request, response) => {
+obpRouter.put("/save/:id", async (request, response) => {
+    user = {
+        consent: [request.session.oauthAccessToken,request.session.oauthAccessTokenSecret]
+    }
+    const updatedUser = await User.findByIdAndUpdate(request.params.id, user, {new:true})
+
     response.end("Signed in")
 })
 
