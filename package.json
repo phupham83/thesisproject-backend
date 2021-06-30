@@ -10,27 +10,28 @@
     "start:test": "cross-env NODE_ENV=test node index.js",
     "build:ui": "rm -rf build && cd ../thesisproject/ && npm run build --prod && cp -r build ../thesisproject-backend",
     "deploy": "git push heroku main",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",    
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",
     "logs:prod": "heroku logs --tail"
   },
   "author": "Phu Pham",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-mongo": "^4.4.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "express-session": "^1.10.1",
-    "oauth": "^0.9.12",
     "express-async-errors": "^3.1.1",
-    "mongoose-unique-validator": "^2.0.3",
-    "bcryptjs": "^2.4.3",
+    "express-session": "^1.10.1",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.12.14"
+    "mongoose": "^5.12.14",
+    "mongoose-unique-validator": "^2.0.3",
+    "oauth": "^0.9.12"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7",
     "cross-env": "^7.0.3",
     "jest": "^27.0.1",
+    "nodemon": "^2.0.7",
     "supertest": "^6.1.3"
   }
 }

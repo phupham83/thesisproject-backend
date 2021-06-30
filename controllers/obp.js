@@ -6,7 +6,10 @@ const { response } = require("express")
 const util = require('util')
 const { request } = require("http")
 const User = require('../models/user')
+const MongoStore = require('connect-mongo')
+const mongoose = require('mongoose')
 
+const db = mongoose.connection
 const _openbankConsumerKey = config.consumerKey
 const _openbankConsumerSecret = config.consumerSecret
 const _openbankRedirectUrl = config.redirectUrl
@@ -25,7 +28,8 @@ const consumer = new oauth.OAuth(
 obpRouter.use(session({
     secret: config.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    store: new MongoStore({mongooseConnection: db})
 }))
 
 obpRouter.get("/connect", (request, response) => {
