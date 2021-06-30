@@ -7,9 +7,7 @@ const util = require('util')
 const { request } = require("http")
 const User = require('../models/user')
 const MongoStore = require('connect-mongo')
-const mongoose = require('mongoose')
 
-const db = mongoose.connection
 const _openbankConsumerKey = config.consumerKey
 const _openbankConsumerSecret = config.consumerSecret
 const _openbankRedirectUrl = config.redirectUrl
@@ -29,7 +27,7 @@ obpRouter.use(session({
     secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    store: new MongoStore({mongooseConnection: db})
+    store: MongoStore.create({mongoUrl: config.MONGODB_URI})
 }))
 
 obpRouter.get("/connect", (request, response) => {
