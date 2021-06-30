@@ -1,8 +1,9 @@
 const express = require('express')
+const path = require('path')
 require("express-async-errors")
 const app = express()
 const cors = require('cors')
-app.use(express.static('build'))
+app.use(express.static(path.join(__dirname, 'build')))
 const logger = require("./utils/logger")
 const config = require('./utils/config')
 const transactionRouter = require("./controllers/transactions")
@@ -13,7 +14,7 @@ const obpRouter = require("./controllers/obp")
 
 logger.info('connecting to', config.MONGODB_URI)
 app.get('/*', function (req, res) {
-    res.sendFile(path.join('build', 'index.html'));
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
   })
 app.use(cors())
 app.use(express.json())
