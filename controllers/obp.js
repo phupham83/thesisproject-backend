@@ -55,7 +55,7 @@ obpRouter.get("/callback", (request, response) => {
             //error is now undefined
             request.session.oauthAccessToken = oauthAccessToken
             request.session.oauthAccessTokenSecret = oauthAccessTokenSecret
-            response.end("Saved token")
+            response.redirect("/consent")
           }
         }
       )
