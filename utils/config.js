@@ -19,5 +19,6 @@ module.exports = {
   consumerKey,
   consumerSecret,
   redirectUrl,
-  apiHost
+  apiHost,
+  SESSION_SECRET
 }
