@@ -12,6 +12,9 @@ const loginRouter = require("./controllers/login")
 const obpRouter = require("./controllers/obp")
 
 logger.info('connecting to', config.MONGODB_URI)
+app.get('/*', function (req, res) {
+    res.sendFile(path.join('build', 'index.html'));
+  })
 app.use(cors())
 app.use(express.json())
 app.use("/api/transactions", transactionRouter)
