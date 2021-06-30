@@ -23,7 +23,7 @@ const consumer = new oauth.OAuth(
 )
 
 obpRouter.use(session({
-    secret: "very secret",
+    secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: true
 }))

@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const PORT = process.env.PORT
+const SESSION_SECRET = process.env.SESSION_SECRET
 
 const consumerKey = process.env.consumerKey
 const consumerSecret = process.env.consumerSecret
