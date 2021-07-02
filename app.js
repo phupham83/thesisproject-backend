@@ -35,7 +35,7 @@ app.use(session({
   secret: config.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  store: MongoStore.create({mongoUrl: config.MONGODB_URI})
+  store: MongoStore.create({mongoUrl: config.MONGODB_URI, ttl: 7200})
 }))
 app.use(passport.initialize())
 app.use(passport.session())
