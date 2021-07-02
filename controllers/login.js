@@ -1,32 +1,34 @@
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
 const loginRouter = require('express').Router()
-const User = require('../models/user')
+const passport = require("passport")
 
-loginRouter.post('/', async (request, response) => {
-  const body = request.body
-
-  const user = await User.findOne({ username: body.username })
-  const passwordCorrect = user === null
-    ? false
-    : await bcrypt.compare(body.password, user.passwordHash)
-
-  if (!(user && passwordCorrect)) {
-    return response.status(401).json({
-      error: 'invalid username or password'
-    })
-  }
-
-  const userForToken = {
-    username: user.username,
-    id: user._id,
-  }
-
-  const token = jwt.sign(userForToken, process.env.SECRET)
-
-  response
-    .status(200)
-    .send({ token, username: user.username, name: user.name, consent: user.consent, id: user._id })
+loginRouter.post('/', (req, res, next) => {
+  passport.authenticate("local", function(err, user, info) {
+      if (err) {
+          return res.status(400).json({ errors: err });
+      }
+      if (!user) {
+          return res.status(400).json({ errors: "No user found" });
+      }
+      req.logIn(user, function(err) {
+          if (err) {
+              return res.status(400).json({ errors: err });
+          }
+          return res.status(200).json(user);
+      });
+  })(req, res, next);
 })
 
+loginRouter.get("/local_login", (request, response) => {
+    const user = request.user
+    if(user){
+        return response.status(200).json(user)
+    }else {
+        return response.status(200).json(null)
+    }
+})
+
+loginRouter.get("/logout", (request,response) => {
+    request.logOut()
+    response.send("logged out")
+})
 module.exports = loginRouter
