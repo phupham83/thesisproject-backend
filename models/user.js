@@ -12,9 +12,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  consent: {
+  codes:{
     type: Array,
     default: null
+  },
+  consent: {
+    type: Boolean,
+    default: false
   }
 })
 userSchema.plugin(uniqueValidator)

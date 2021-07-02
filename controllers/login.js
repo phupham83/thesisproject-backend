@@ -13,7 +13,7 @@ loginRouter.post('/', (req, res, next) => {
           if (err) {
               return res.status(400).json({ errors: err });
           }
-          return res.status(200).json(user);
+          return res.status(200).json({id: user.id, consent: user.consent, username: user.username, name: user.name});
       });
   })(req, res, next);
 })

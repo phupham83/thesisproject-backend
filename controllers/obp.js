@@ -44,7 +44,8 @@ obpRouter.get("/callback",(request, response) => {
           } else {
             //error is now undefined
             const user = {
-                consent :[oauthAccessToken,oauthAccessTokenSecret]
+                consent: true,
+                codes :[oauthAccessToken,oauthAccessTokenSecret]
               }
             const updatedUser = await User.findByIdAndUpdate(request.user.id, user, {new:true})
             
@@ -58,8 +59,8 @@ obpRouter.get("/callback",(request, response) => {
 obpRouter.get("/getMyAccounts", async (request, response) =>{
     const user = request.user
     consumer.get(apiHost + "/obp/v3.0.0/my/accounts",
-    user.consent[0],
-    user.consent[1],
+    user.codes[0],
+    user.codes[1],
     (error, data, res) => {
         try {
             response.json(data)
