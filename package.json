@@ -11,7 +11,8 @@
     "build:ui": "rm -rf build && cd ../thesisproject/ && npm run build --prod && cp -r build ../thesisproject-backend",
     "deploy": "git push heroku main",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",
-    "logs:prod": "heroku logs --tail"
+    "logs:prod": "heroku logs --tail",
+    "lint": "eslint ."
   },
   "author": "Phu Pham",
   "license": "ISC",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
+    "eslint": "^7.30.0",
     "jest": "^27.0.1",
     "nodemon": "^2.0.7",
     "supertest": "^6.1.3"

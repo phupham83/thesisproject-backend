@@ -20,11 +20,11 @@ passport.use(
             bcrypt.compare(password, user.passwordHash, (err, isMatch) => {
                 if (err) throw err
                 if (isMatch) {
-                    return done(null, user);
+                    return done(null, user)
                 } else {
-                    return done(null, false, { message: "Wrong password" });
-                    }
-                })
+                    return done(null, false, { message: "Wrong password" })
+                }
+            })
         } catch (err) {
             return done(null, false, { message: err })
         }
