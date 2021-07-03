@@ -3,7 +3,6 @@ const path = require("path")
 require("express-async-errors")
 const app = express()
 const session = require("express-session")
-const cors = require("cors")
 app.use(express.static(path.join(__dirname, "build")))
 const logger = require("./utils/logger")
 const config = require("./utils/config")
@@ -18,28 +17,26 @@ const obpRouter = require("./controllers/obp")
 
 logger.info("connecting to", config.MONGODB_URI)
 
-app.use(cors())
 app.use(express.json())
 const mongoUrl = config.MONGODB_URI
 
-mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
-    .then(() => {
+const clientP = mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
+    .then((m) => {
         logger.info("connected to MongoDB")
+        return m.connection.getClient()
     })
     .catch((error) => {
         logger.info("error connecting to MongoDB:", error.message)
     })
 
-
 app.use(session({
     secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    store: MongoStore.create({mongoUrl: config.MONGODB_URI, ttl: 7200})
+    store: MongoStore.create({clientPromise: clientP , ttl: 7200})
 }))
 app.use(passport.initialize())
 app.use(passport.session())
-
   
 app.use("/api/transactions", transactionRouter)
 app.use("/api/users", usersRouter)
