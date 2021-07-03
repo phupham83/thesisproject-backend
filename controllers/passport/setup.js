@@ -14,25 +14,22 @@ passport.deserializeUser((id, done) => {
 })
 
 passport.use(
-    new LocalStrategy({ usernameField: "username" }, (username, password, done) => {
-        // Match User
-        User.findOne({ username: username })
-            .then(user => {
-                    // Match password
-                    bcrypt.compare(password, user.passwordHash, (err, isMatch) => {
-                        if (err) throw err;
-
-                        if (isMatch) {
-                            return done(null, user);
-                        } else {
-                            return done(null, false, { message: "Wrong password" });
-                        }
-                    });
-            })
-            .catch(err => {
-                return done(null, false, { message: err });
-            });
+    new LocalStrategy({ usernameField: "username" }, async (username, password, done) => {
+        const user = await User.findOne({ username: username })
+        try {
+            bcrypt.compare(password, user.passwordHash, (err, isMatch) => {
+                if (err) throw err
+                if (isMatch) {
+                    return done(null, user);
+                } else {
+                    return done(null, false, { message: "Wrong password" });
+                    }
+                })
+        } catch (err) {
+            return done(null, false, { message: err })
+        }
+        
     })
-);
+)
 
 module.exports = passport
