@@ -56,7 +56,7 @@ obpRouter.get("/callback",(request, response) => {
 })
 
 
-obpRouter.get("/getMyAccounts", async (request, response) =>{
+obpRouter.get("/getMyAccounts", (request, response) =>{
     const user = request.user
     consumer.get(apiHost + "/obp/v3.0.0/my/accounts",
         user.codes[0],

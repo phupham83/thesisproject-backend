@@ -29,6 +29,7 @@ loginRouter.get("/local_login", (request, response) => {
 
 loginRouter.get("/logout", (request,response) => {
     request.logOut()
+    request.session.destroy()
     response.send("logged out")
 })
 module.exports = loginRouter
