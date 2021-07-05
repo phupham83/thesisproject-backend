@@ -42,6 +42,11 @@ app.use("/api/transactions", transactionRouter)
 app.use("/api/users", usersRouter)
 app.use("/api/login", loginRouter)
 app.use("/api/obpApi", obpRouter)
+
+if (process.env.NODE_ENV === "test") {
+    const testingRouter = require("./controllers/testing")
+    app.use("/api/testing", testingRouter)
+}
 app.get("/*", function (req, res) {
     res.sendFile(path.join(__dirname, "build", "index.html"))
 })
