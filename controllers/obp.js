@@ -63,7 +63,8 @@ obpRouter.get("/getMyAccounts", (request, response) =>{
         user.codes[1],
         (error, data) => {
             try {
-                response.json(data)
+                const parsedData = JSON.parse(data)
+                response.status(200).json(parsedData)
             } catch (e) {
                 console.log(e)
             }
