@@ -3,24 +3,12 @@ const supertest = require("supertest")
 const session = require("supertest-session")
 const app = require("../app")
 const helper = require("./test_helper")
-const Transaction = require("../models/transaction")
 const User = require("../models/user")
 
 
 const api = supertest(app)
 var testSession = null
 
-describe("transactions test", ()=>{
-    beforeEach(async ()=>{
-        await Transaction.deleteMany({})
-        const transactionObjects = helper.initialTransactions.map(transaction => new Transaction(transaction))
-        const promiseArray  = transactionObjects.map(transaction => transaction.save())
-        await Promise.all(promiseArray)
-    })
-    test("transactions are returned as json", async () =>{
-        await api.get("/api/transactions").expect(200).expect("Content-Type", /application\/json/)
-    })
-})
 
 describe("when there is one user in the db", ()=>{
     beforeEach(async () =>{
