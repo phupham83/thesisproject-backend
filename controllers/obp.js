@@ -71,9 +71,12 @@ obpRouter.get("/getMyAccounts", (request, response) =>{
         })
 })
 
-obpRouter.get("/getTransactions", (request, response) => {
+obpRouter.get("/getTransactions/:bankid/:id",  (request,response) => {
     const user = request.user
-    consumer.get(apiHost + "/obp/v4.0.0/banks/gh.29.fi/accounts/9c0502d7-c076-424d-a2bc-cb689edb4734/owner/transactions",
+    const id = request.params.id
+    const bank_id = request.params.bankid
+    
+    consumer.get(apiHost + "/obp/v4.0.0/banks/"+ bank_id + "/accounts/"+ id + "/owner/transactions",
         user.codes[0],
         user.codes[1],
         (error, data) => {
