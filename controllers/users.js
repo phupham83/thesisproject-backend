@@ -28,14 +28,15 @@ usersRouter.post("/", async (request, response) => {
     response.json(savedUser)
 })
 
-usersRouter.put("/:id", async (request, response) => {
-    const body = request.body
-    const user = {
-        consent: body.consent
+usersRouter.put("/revoke", async (request, response) => {
+    const user = request.user
+    const newUser = {
+        consent: false,
+        codes: null
     }
-    const updatedUser = await User.findByIdAndUpdate(request.params.id, user, {new:true})
+    const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
 
-    response.json(updatedUser)
+    response.json({ consent: updatedUser.consent, username: updatedUser.username, name: updatedUser.name})
 })
 
 module.exports = usersRouter
