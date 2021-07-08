@@ -89,6 +89,23 @@ obpRouter.get("/getTransactions/:bankid/:id",  (request,response) => {
         })
 })
 
+obpRouter.get("/getBalance/:bankid", (request, response) => {
+    const user = request.user
+    const bank_id = request.params.bankid
+
+    consumer.get(apiHost + "/obp/v4.0.0/banks/" + bank_id + "/balances",
+        user.codes[0],
+        user.codes[1],
+        (error, data) => {
+            try {
+                const parsedData = JSON.parse(data)
+                response.status(200).json(parsedData)
+            } catch (e) {
+                console.log(e)
+            }
+        })
+})
+
 
 module.exports = obpRouter
 
