@@ -49,7 +49,7 @@ obpRouter.get("/callback",(request, response) => {
                 }
                 await User.findByIdAndUpdate(request.user.id, user, {new:true})
             
-                response.redirect("/accounts")
+                response.redirect("/choose_bank")
             }
         }
     )
@@ -106,7 +106,46 @@ obpRouter.get("/getBalance/:bankid", (request, response) => {
         })
 })
 
+obpRouter.post("/grantView", (request, response) => {
+    const body = request.body
+    const user = request.user
+    const requestBody = JSON.stringify({user_id: "adeee6aa-f237-4553-a6eb-2dc9f25a48a3",view: { view_id:"owner", is_system:true }})
+    const contentType = "application/json"
+    consumer.post(apiHost + "/obp/v4.0.0/banks/" + body.bank + "/accounts/" + body.account + "/account-access/grant",
+        user.codes[0],
+        user.codes[1],
+        requestBody,
+        contentType,
+        (error, data) => {
+            try {
+                const parsedData = JSON.parse(data)
+                response.status(200).json(parsedData)
+            } catch (e) {
+                console.log(e)
+            }
+        })
+})
+
+obpRouter.post("/revokeView", (request, response) => {
+    const body = request.body
+    const user = request.user
+    const requestBody = JSON.stringify({user_id: "adeee6aa-f237-4553-a6eb-2dc9f25a48a3",view: { view_id:"owner", is_system:true }})
+    const contentType = "application/json"
+    consumer.post(apiHost + "/obp/v4.0.0/banks/" + body.bank + "/accounts/" + body.account + "/account-access/revoke",
+        user.codes[0],
+        user.codes[1],
+        requestBody,
+        contentType,
+        (error, data) => {
+            try {
+                const parsedData = JSON.parse(data)
+                response.status(200).json(parsedData)
+            } catch (e) {
+                console.log(e)
+            }
+        })
+})
+
 
 
 module.exports = obpRouter
-

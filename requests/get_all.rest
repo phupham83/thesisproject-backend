@@ -12,8 +12,13 @@ Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJhY
 GET http://localhost:3001/api/users
 
 ###
-GET http://localhost:3001/api/obpApi/getMyAccounts/60db274832df2213fc9346ed
+POST http://localhost:3001/api/obpApi/grantView
+Content-Type: application/json
 
+{
+    "bank_id": "gh.29.fi",
+    "id": "9c0502d7-c076-424d-a2bc-cb689edb4734"
+}
 ###
 POST   http://localhost:3001/api/users
 Content-Type: application/json
