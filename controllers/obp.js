@@ -9,6 +9,8 @@ const _openbankConsumerKey = config.consumerKey
 const _openbankConsumerSecret = config.consumerSecret
 const _openbankRedirectUrl = config.redirectUrl
 const apiHost = config.apiHost
+const mainAccessToken = config.mainAccessToken
+const mainAccessTokenSecret = config.mainAccessTokenSecret
 
 const consumer = new oauth.OAuth(
     apiHost + "/oauth/initiate",
@@ -44,11 +46,11 @@ obpRouter.get("/callback",(request, response) => {
             } else {
             //error is now undefined
                 const user = {
-                    consent: true,
-                    codes :[oauthAccessToken,oauthAccessTokenSecret]
+                    consent: true
                 }
                 await User.findByIdAndUpdate(request.user.id, user, {new:true})
-            
+                request.session.oauthAccessToken = oauthAccessToken
+                request.session.oauthAccessTokenSecret = oauthAccessTokenSecret
                 response.redirect("/choose_bank")
             }
         }
@@ -57,10 +59,9 @@ obpRouter.get("/callback",(request, response) => {
 
 
 obpRouter.get("/getMyAccounts", (request, response) =>{
-    const user = request.user
     consumer.get(apiHost + "/obp/v3.0.0/my/accounts",
-        user.codes[0],
-        user.codes[1],
+        request.session.oauthAccessToken,
+        request.session.oauthAccessTokenSecret,
         (error, data) => {
             try {
                 const parsedData = JSON.parse(data)
@@ -72,13 +73,29 @@ obpRouter.get("/getMyAccounts", (request, response) =>{
 })
 
 obpRouter.get("/getTransactions/:bankid/:id",  (request,response) => {
-    const user = request.user
     const id = request.params.id
     const bank_id = request.params.bankid
     
     consumer.get(apiHost + "/obp/v4.0.0/banks/"+ bank_id + "/accounts/"+ id + "/owner/transactions",
-        user.codes[0],
-        user.codes[1],
+        mainAccessToken,
+        mainAccessTokenSecret,
+        (error, data) => {
+            try {
+                const parsedData = JSON.parse(data)
+                response.status(200).json(parsedData)
+            } catch (e) {
+                console.log(e)
+            }
+        })
+})
+
+obpRouter.get("/getAccount/:bankid/:id",  (request,response) => {
+    const id = request.params.id
+    const bank_id = request.params.bankid
+    
+    consumer.get(apiHost + "/obp/v4.0.0/banks/"+ bank_id + "/accounts/"+ id + "/owner/account",
+        mainAccessToken,
+        mainAccessTokenSecret,
         (error, data) => {
             try {
                 const parsedData = JSON.parse(data)
@@ -90,12 +107,11 @@ obpRouter.get("/getTransactions/:bankid/:id",  (request,response) => {
 })
 
 obpRouter.get("/getBalance/:bankid", (request, response) => {
-    const user = request.user
     const bank_id = request.params.bankid
 
     consumer.get(apiHost + "/obp/v4.0.0/banks/" + bank_id + "/balances",
-        user.codes[0],
-        user.codes[1],
+        mainAccessToken,
+        mainAccessTokenSecret,
         (error, data) => {
             try {
                 const parsedData = JSON.parse(data)
@@ -108,12 +124,11 @@ obpRouter.get("/getBalance/:bankid", (request, response) => {
 
 obpRouter.post("/grantView", (request, response) => {
     const body = request.body
-    const user = request.user
     const requestBody = JSON.stringify({user_id: "adeee6aa-f237-4553-a6eb-2dc9f25a48a3",view: { view_id:"owner", is_system:true }})
     const contentType = "application/json"
     consumer.post(apiHost + "/obp/v4.0.0/banks/" + body.bank + "/accounts/" + body.account + "/account-access/grant",
-        user.codes[0],
-        user.codes[1],
+        request.session.oauthAccessToken,
+        request.session.oauthAccessTokenSecret,
         requestBody,
         contentType,
         (error, data) => {
@@ -128,12 +143,11 @@ obpRouter.post("/grantView", (request, response) => {
 
 obpRouter.post("/revokeView", (request, response) => {
     const body = request.body
-    const user = request.user
     const requestBody = JSON.stringify({user_id: "adeee6aa-f237-4553-a6eb-2dc9f25a48a3",view: { view_id:"owner", is_system:true }})
     const contentType = "application/json"
     consumer.post(apiHost + "/obp/v4.0.0/banks/" + body.bank + "/accounts/" + body.account + "/account-access/revoke",
-        user.codes[0],
-        user.codes[1],
+        mainAccessToken,
+        mainAccessTokenSecret,
         requestBody,
         contentType,
         (error, data) => {

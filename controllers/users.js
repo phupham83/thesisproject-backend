@@ -30,15 +30,37 @@ usersRouter.post("/", async (request, response) => {
     response.json(savedUser)
 })
 
-usersRouter.put("/revoke", async (request, response) => {
+usersRouter.put("/revokeSingle", async (request, response) => {
+    const user = request.user
+    const id = request.body.account
+    if(user.accountIds.length === 1){
+        const newUser = {
+            consent: false,
+            accountIds: []
+        }
+        const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
+    
+        response.json({ consent: updatedUser.consent, username: updatedUser.username, name: updatedUser.name, accountIds: updatedUser.accountIds})
+    }else{
+        const newUser = {
+            accountIds: user.accountIds.filter(account => account.account !== id )
+        }
+        const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
+        response.json({ consent: updatedUser.consent, username: updatedUser.username, name: updatedUser.name, accountIds: updatedUser.accountIds})
+    }
+    
+})
+
+usersRouter.put("/addAccounts", async (request, response) => {
+    const body = request.body
     const user = request.user
     const newUser = {
-        consent: false,
-        codes: null
+        accountIds: body
     }
     const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
 
-    response.json({ consent: updatedUser.consent, username: updatedUser.username, name: updatedUser.name})
+    response.json({ consent: updatedUser.consent, username: updatedUser.username, name: updatedUser.name, accountIds: updatedUser.accounts})
 })
+
 
 module.exports = usersRouter

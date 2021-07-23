@@ -13,7 +13,7 @@ loginRouter.post("/", (req, res, next) => {
             if (err) {
                 return res.status(400).json({ errors: err })
             }
-            return res.status(200).json({ consent: user.consent, username: user.username, name: user.name})
+            return res.status(200).json({ consent: user.consent, username: user.username, name: user.name, accountIds: user.accountIds})
         })
     })(req, res, next)
 })
@@ -21,7 +21,7 @@ loginRouter.post("/", (req, res, next) => {
 loginRouter.get("/local_login", (request, response) => {
     const user = request.user
     if(user){
-        return response.status(200).json({ consent: user.consent, username: user.username, name: user.name})
+        return response.status(200).json({ consent: user.consent, username: user.username, name: user.name, accountIds: user.accountIds})
     }else {
         return response.status(200).json(null)
     }

@@ -7,7 +7,8 @@ const consumerKey = process.env.consumerKey
 const consumerSecret = process.env.consumerSecret
 const redirectUrl = process.env.redirectUrl
 const apiHost = process.env.apiHost
-
+const mainAccessTokenSecret = process.env.mainAccessTokenSecret
+const mainAccessToken = process.env.mainAccessToken
 
 const MONGODB_URI = process.env.NODE_ENV ==="test"
     ? process.env.TEST_MONGODB_URI
@@ -20,5 +21,7 @@ module.exports = {
     consumerSecret,
     redirectUrl,
     apiHost,
-    SESSION_SECRET
+    SESSION_SECRET,
+    mainAccessToken,
+    mainAccessTokenSecret
 }
