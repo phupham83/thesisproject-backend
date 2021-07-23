@@ -51,7 +51,7 @@ obpRouter.get("/callback",(request, response) => {
                 await User.findByIdAndUpdate(request.user.id, user, {new:true})
                 request.session.oauthAccessToken = oauthAccessToken
                 request.session.oauthAccessTokenSecret = oauthAccessTokenSecret
-                response.redirect("/choose_bank")
+                response.redirect("/choose")
             }
         }
     )
