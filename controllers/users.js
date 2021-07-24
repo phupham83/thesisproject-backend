@@ -1,6 +1,9 @@
 const bcrypt = require("bcryptjs")
+const jwt = require("jsonwebtoken")
+const config = require("../utils/config")
 const usersRouter = require("express").Router()
 const User = require("../models/user")
+const nodemailer = require("../utils/nodemailer.config")
 
 if (process.env.NODE_ENV === "development") {
     usersRouter.get("/", async (request, response) => {
@@ -18,7 +21,7 @@ usersRouter.post("/", async (request, response) => {
     }
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.password, saltRounds)
-
+    
     const user = new User({
         email: body.email,
         name: body.name,
@@ -26,8 +29,23 @@ usersRouter.post("/", async (request, response) => {
     })
 
     const savedUser = await user.save()
+    const token = jwt.sign({id: savedUser.id}, config.SECRET)
+    nodemailer.sendConfirmationEmail(body.name,body.email,token)
+    response.json(token)
+})
 
-    response.json(savedUser)
+usersRouter.get("/verify/:confirmationCode", async (request, response) => {
+    const token = request.params.confirmationCode
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    if (!token || !decodedToken.id) {
+        return response.status(401).json({ error: "token missing or invalid" })
+    }
+    const user = await User.findById(decodedToken.id)
+    const newUser = {
+        verified: true
+    }
+    await User.findByIdAndUpdate(user.id, newUser, {new:true})
+    response.redirect("/verified")
 })
 
 usersRouter.put("/revokeSingle", async (request, response) => {

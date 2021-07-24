@@ -2,6 +2,7 @@ require("dotenv").config()
 
 const PORT = process.env.PORT
 const SESSION_SECRET = process.env.SESSION_SECRET
+const SECRET = process.env.SECRET
 
 const consumerKey = process.env.consumerKey
 const consumerSecret = process.env.consumerSecret
@@ -9,6 +10,9 @@ const redirectUrl = process.env.redirectUrl
 const apiHost = process.env.apiHost
 const mainAccessTokenSecret = process.env.mainAccessTokenSecret
 const mainAccessToken = process.env.mainAccessToken
+const email = process.env.email
+const pass = process.env.pass
+const site = process.env.site
 
 const MONGODB_URI = process.env.NODE_ENV ==="test"
     ? process.env.TEST_MONGODB_URI
@@ -23,5 +27,9 @@ module.exports = {
     apiHost,
     SESSION_SECRET,
     mainAccessToken,
-    mainAccessTokenSecret
+    mainAccessTokenSecret,
+    SECRET,
+    email,
+    pass,
+    site
 }
