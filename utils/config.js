@@ -13,6 +13,8 @@ const mainAccessToken = process.env.mainAccessToken
 const email = process.env.email
 const pass = process.env.pass
 const site = process.env.site
+const accountSid = process.env.TWILIO_ACCOUNT_SID
+const authToken = process.env.TWILIO_AUTH_TOKEN
 
 const MONGODB_URI = process.env.NODE_ENV ==="test"
     ? process.env.TEST_MONGODB_URI
@@ -31,5 +33,7 @@ module.exports = {
     SECRET,
     email,
     pass,
-    site
+    site,
+    accountSid,
+    authToken
 }

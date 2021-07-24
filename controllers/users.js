@@ -4,6 +4,7 @@ const config = require("../utils/config")
 const usersRouter = require("express").Router()
 const User = require("../models/user")
 const nodemailer = require("../utils/nodemailer.config")
+const smsSend = require("../utils/send_sms")
 
 if (process.env.NODE_ENV === "development") {
     usersRouter.get("/", async (request, response) => {
@@ -25,12 +26,14 @@ usersRouter.post("/", async (request, response) => {
     const user = new User({
         email: body.email,
         name: body.name,
+        number: body.number,
         passwordHash,
     })
 
     const savedUser = await user.save()
     const token = jwt.sign({id: savedUser.id}, config.SECRET)
     nodemailer.sendConfirmationEmail(body.name,body.email,token)
+    smsSend.sendConfirmSMS(body.number, "12346")
     response.json(token)
 })
 
