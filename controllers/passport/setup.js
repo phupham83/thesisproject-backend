@@ -14,19 +14,22 @@ passport.deserializeUser((id, done) => {
 })
 
 passport.use(
-    new LocalStrategy({ usernameField: "username" }, async (username, password, done) => {
-        const user = await User.findOne({ username: username })
+    new LocalStrategy({ usernameField: "email" }, async (email, password, done) => {
+        const user = await User.findOne({ email: email })
         try {
+            if(user.verified !== true){
+                return done(null, false, { error: "User has not verified their email" })
+            }
             bcrypt.compare(password, user.passwordHash, (err, isMatch) => {
                 if (err) throw err
                 if (isMatch) {
                     return done(null, user)
                 } else {
-                    return done(null, false, { message: "Wrong password" })
+                    return done(null, false, { error: "Wrong password" })
                 }
             })
         } catch (err) {
-            return done(null, false, { message: err })
+            return done(null, false, { error: err })
         }
         
     })

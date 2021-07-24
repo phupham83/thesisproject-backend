@@ -20,7 +20,7 @@ usersRouter.post("/", async (request, response) => {
     const passwordHash = await bcrypt.hash(body.password, saltRounds)
 
     const user = new User({
-        username: body.username,
+        email: body.email,
         name: body.name,
         passwordHash,
     })
@@ -40,13 +40,13 @@ usersRouter.put("/revokeSingle", async (request, response) => {
         }
         const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
     
-        response.json({ consent: updatedUser.consent, username: updatedUser.username, name: updatedUser.name, accountIds: updatedUser.accountIds})
+        response.json({ consent: updatedUser.consent, email: updatedUser.email, name: updatedUser.name, accountIds: updatedUser.accountIds})
     }else{
         const newUser = {
             accountIds: user.accountIds.filter(account => account.account !== id )
         }
         const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
-        response.json({ consent: updatedUser.consent, username: updatedUser.username, name: updatedUser.name, accountIds: updatedUser.accountIds})
+        response.json({ consent: updatedUser.consent, email: updatedUser.email, name: updatedUser.name, accountIds: updatedUser.accountIds})
     }
     
 })
@@ -59,7 +59,7 @@ usersRouter.put("/addAccounts", async (request, response) => {
     }
     const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
 
-    response.json({ consent: updatedUser.consent, username: updatedUser.username, name: updatedUser.name, accountIds: updatedUser.accounts})
+    response.json({ consent: updatedUser.consent, email: updatedUser.email, name: updatedUser.name, accountIds: updatedUser.accounts})
 })
 
 
