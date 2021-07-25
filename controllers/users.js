@@ -33,7 +33,6 @@ usersRouter.post("/", async (request, response) => {
     const savedUser = await user.save()
     const token = jwt.sign({id: savedUser.id}, config.SECRET)
     nodemailer.sendConfirmationEmail(body.name,body.email,token)
-    smsSend.sendConfirmSMS(body.number, "12346")
     response.json(token)
 })
 
@@ -48,7 +47,14 @@ usersRouter.get("/verify/:confirmationCode", async (request, response) => {
         verified: true
     }
     await User.findByIdAndUpdate(user.id, newUser, {new:true})
-    response.redirect("/verified")
+    smsSend.sendConfirmSMS(user.number, "12346")
+    response.redirect("/signUpSMSstep")
+})
+
+usersRouter.get("/checkEmailVerified/:email", async (request, response) =>{
+    const email = request.params.email
+    const user = await User.findOne({email: email})
+    response.json({verified: user.verified})
 })
 
 usersRouter.put("/revokeSingle", async (request, response) => {
