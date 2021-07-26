@@ -6,6 +6,8 @@ const User = require("../models/user")
 const nodemailer = require("../utils/nodemailer.config")
 const smsSend = require("../utils/send_sms")
 const speakeasy = require("speakeasy")
+const emailValidator = require("email-validator")
+const {phone} = require("phone")
 
 if (process.env.NODE_ENV === "development") {
     usersRouter.get("/", async (request, response) => {
@@ -21,22 +23,27 @@ usersRouter.post("/", async (request, response) => {
     if(body.password.length < 3){
         response.status(400).send({ error: "Password length must be longer then 3" })
     }
-    const saltRounds = 10
-    const passwordHash = await bcrypt.hash(body.password, saltRounds)
-    const temp_secret = speakeasy.generateSecret()
-    
-    const user = new User({
-        email: body.email,
-        name: body.name,
-        number: body.number,
-        passwordHash,
-        secret: temp_secret.base32
-    })
+    if(emailValidator.validate(body.email) === false){
+        response.status(400).send({ error: "Invalid email" })
+    }else if(phone(body.number).isValid === false){
+        response.status(400).send({ error: "Invalid phone number" })
+    }else{
+        const saltRounds = 10
+        const passwordHash = await bcrypt.hash(body.password, saltRounds)
+        const temp_secret = speakeasy.generateSecret()
+        const user = new User({
+            email: body.email,
+            name: body.name,
+            number: phone(body.number).phoneNumber,
+            passwordHash,
+            secret: temp_secret.base32
+        })
 
-    const savedUser = await user.save()
-    const token = jwt.sign({id: savedUser.id}, config.SECRET)
-    nodemailer.sendConfirmationEmail(body.name,body.email,token)
-    response.json(token)
+        const savedUser = await user.save()
+        const token = jwt.sign({id: savedUser.id}, config.SECRET)
+        nodemailer.sendConfirmationEmail(body.name,body.email,token)
+        response.json(token)
+    } 
 })
 
 usersRouter.get("/verify/:confirmationCode", async (request, response) => {

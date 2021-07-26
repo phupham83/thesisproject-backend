@@ -20,6 +20,7 @@
     "bcryptjs": "^2.4.3",
     "connect-mongo": "^4.4.1",
     "dotenv": "^10.0.0",
+    "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
     "express-session": "^1.10.1",
@@ -31,6 +32,7 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
+    "phone": "^3.1.2",
     "speakeasy": "^2.0.0",
     "twilio": "^3.66.0"
   },
