@@ -40,6 +40,7 @@ usersRouter.post("/", async (request, response) => {
         })
 
         const savedUser = await user.save()
+        request.session.tempId = user.id
         const token = jwt.sign({id: savedUser.id}, config.SECRET)
         nodemailer.sendConfirmationEmail(body.name,body.email,token)
         response.json(token)
@@ -58,7 +59,7 @@ usersRouter.get("/verify/:confirmationCode", async (request, response) => {
     }
     await User.findByIdAndUpdate(user.id, newUser, {new:true})
     request.session.tempId = user.id
-    const SMStoken = speakeasy.totp({ secret: user.secret, encoding: "base32"})
+    const SMStoken = speakeasy.totp({ secret: user.secret, encoding: "base32", step: 120})
     smsSend.sendConfirmSMS(user.number, SMStoken)
     response.redirect("/signUpSMSstep")
 })
@@ -66,7 +67,7 @@ usersRouter.get("/verify/:confirmationCode", async (request, response) => {
 usersRouter.get("/verifySMS/:confirmationCode", async (request, response) => {
     const token = request.params.confirmationCode
     const user = await User.findById(request.session.tempId)
-    const verified = speakeasy.totp.verify({secret: user.secret, encoding:"base32", token: token})
+    const verified = speakeasy.totp.verify({secret: user.secret, encoding:"base32", token: token, step: 120})
     if(verified === false) {
         return response.status(401).json({ error: "Wrong code" })
     }
@@ -77,9 +78,8 @@ usersRouter.get("/verifySMS/:confirmationCode", async (request, response) => {
     response.status(200).json({SMSverified: true})
 })
 
-usersRouter.get("/checkEmailVerified/:email", async (request, response) =>{
-    const email = request.params.email
-    const user = await User.findOne({email: email})
+usersRouter.get("/checkEmailVerified", async (request, response) =>{
+    const user = await User.findById(request.session.tempId)
     response.json({verified: user.verified})
 })
 
