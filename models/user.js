@@ -12,6 +12,13 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    secret:{
+        type: String
+    },
+    SMSverified: {
+        type: Boolean,
+        default: false
+    },
     number:{
         type: String,
         required: true

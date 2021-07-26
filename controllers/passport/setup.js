@@ -20,6 +20,9 @@ passport.use(
             if(user.verified !== true){
                 return done(null, false, { error: "User has not verified their email" })
             }
+            if(user.SMSverified !== true){
+                return done(null, false, { error: "User has not verified their phone" })
+            }
             bcrypt.compare(password, user.passwordHash, (err, isMatch) => {
                 if (err) throw err
                 if (isMatch) {

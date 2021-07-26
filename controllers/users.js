@@ -5,6 +5,7 @@ const usersRouter = require("express").Router()
 const User = require("../models/user")
 const nodemailer = require("../utils/nodemailer.config")
 const smsSend = require("../utils/send_sms")
+const speakeasy = require("speakeasy")
 
 if (process.env.NODE_ENV === "development") {
     usersRouter.get("/", async (request, response) => {
@@ -22,12 +23,14 @@ usersRouter.post("/", async (request, response) => {
     }
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.password, saltRounds)
+    const temp_secret = speakeasy.generateSecret()
     
     const user = new User({
         email: body.email,
         name: body.name,
         number: body.number,
         passwordHash,
+        secret: temp_secret.base32
     })
 
     const savedUser = await user.save()
@@ -47,8 +50,24 @@ usersRouter.get("/verify/:confirmationCode", async (request, response) => {
         verified: true
     }
     await User.findByIdAndUpdate(user.id, newUser, {new:true})
-    smsSend.sendConfirmSMS(user.number, "12346")
+    request.session.tempId = user.id
+    const SMStoken = speakeasy.totp({ secret: user.secret, encoding: "base32"})
+    smsSend.sendConfirmSMS(user.number, SMStoken)
     response.redirect("/signUpSMSstep")
+})
+
+usersRouter.get("/verifySMS/:confirmationCode", async (request, response) => {
+    const token = request.params.confirmationCode
+    const user = await User.findById(request.session.tempId)
+    const verified = speakeasy.totp.verify({secret: user.secret, encoding:"base32", token: token})
+    if(verified === false) {
+        return response.status(401).json({ error: "Wrong code" })
+    }
+    const newUser = {
+        SMSverified: true
+    }
+    await User.findByIdAndUpdate(user.id, newUser, {new:true})
+    response.status(200).json({SMSverified: true})
 })
 
 usersRouter.get("/checkEmailVerified/:email", async (request, response) =>{
