@@ -77,11 +77,35 @@ usersRouter.get("/verifySMS/:confirmationCode", async (request, response) => {
     await User.findByIdAndUpdate(user.id, newUser, {new:true})
     response.status(200).json({SMSverified: true})
 })
+usersRouter.get("/reSendSMS", async (request, response) => {
+    const user = await User.findById(request.session.tempId)
+    const SMStoken = speakeasy.totp({ secret: user.secret, encoding: "base32", step: 120})
+    smsSend.sendConfirmSMS(user.number, SMStoken)
+    response.status(200).json({sent: true})
+})
 
 usersRouter.get("/checkEmailVerified", async (request, response) =>{
     const user = await User.findById(request.session.tempId)
     response.json({verified: user.verified})
 })
+
+
+usersRouter.put("/changeNumber", async (request, response) =>{
+    const body = request.body
+    const user = await User.findById(request.session.tempId)
+    if(phone(body.number).isValid === false){
+        response.status(400).send({ error: "Invalid phone number" })
+    }else{
+        const newUser = {
+            number: body.number
+        }
+        await User.findByIdAndUpdate(user.id, newUser, {new:true})
+        const SMStoken = speakeasy.totp({ secret: user.secret, encoding: "base32", step: 120})
+        smsSend.sendConfirmSMS(body.number, SMStoken)
+        response.status(200).json({numberChanged: true})
+    }  
+})
+
 
 usersRouter.put("/revokeSingle", async (request, response) => {
     const user = request.user
