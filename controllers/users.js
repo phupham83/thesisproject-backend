@@ -117,13 +117,13 @@ usersRouter.put("/revokeSingle", async (request, response) => {
         }
         const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
     
-        response.json({ consent: updatedUser.consent, email: updatedUser.email, name: updatedUser.name, accountIds: updatedUser.accountIds})
+        response.json({ consent: updatedUser.consent, accountIds: updatedUser.accountIds})
     }else{
         const newUser = {
             accountIds: user.accountIds.filter(account => account.account !== id )
         }
         const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
-        response.json({ consent: updatedUser.consent, email: updatedUser.email, name: updatedUser.name, accountIds: updatedUser.accountIds})
+        response.json({ consent: updatedUser.consent, accountIds: updatedUser.accountIds})
     }
     
 })
@@ -131,9 +131,17 @@ usersRouter.put("/revokeSingle", async (request, response) => {
 usersRouter.put("/addAccounts", async (request, response) => {
     const body = request.body
     const user = request.user
-    const newUser = {
-        accountIds: body
+    let newUser
+    if(user.accountIds.length === 0 && body.length === 0){
+        newUser = {
+            consent: false
+        }
+    }else{
+        newUser = {
+            accountIds: body
+        }
     }
+
     const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
 
     response.json({ consent: updatedUser.consent, email: updatedUser.email, name: updatedUser.name, accountIds: updatedUser.accounts})

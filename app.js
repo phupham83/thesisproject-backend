@@ -13,6 +13,7 @@ const middleware = require("./utils/middleware")
 const usersRouter = require("./controllers/users")
 const loginRouter = require("./controllers/login")
 const obpRouter = require("./controllers/obp")
+const banksRouter = require("./controllers/banks")
 
 logger.info("connecting to", config.MONGODB_URI)
 
@@ -40,6 +41,7 @@ app.use(passport.session())
 app.use("/api/users", usersRouter)
 app.use("/api/login", loginRouter)
 app.use("/api/obpApi", obpRouter)
+app.use("/api/banks", banksRouter)
 
 if (process.env.NODE_ENV === "test") {
     const testingRouter = require("./controllers/testing")
