@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    budget:{
+        type: Array,
+        default: null
+    },
     passwordHash: {
         type: String,
         required: true

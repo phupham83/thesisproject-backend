@@ -77,6 +77,7 @@ usersRouter.get("/verifySMS/:confirmationCode", async (request, response) => {
     await User.findByIdAndUpdate(user.id, newUser, {new:true})
     response.status(200).json({SMSverified: true})
 })
+
 usersRouter.get("/reSendSMS", async (request, response) => {
     const user = await User.findById(request.session.tempId)
     const SMStoken = speakeasy.totp({ secret: user.secret, encoding: "base32", step: 120})
@@ -145,6 +146,17 @@ usersRouter.put("/addAccounts", async (request, response) => {
     const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
 
     response.json({ consent: updatedUser.consent, email: updatedUser.email, name: updatedUser.name, accountIds: updatedUser.accounts})
+})
+
+usersRouter.put("/setBudget", async (request, response) => {
+    const body = request.body
+    const user = request.user
+    const newUser = {
+        budget: body
+    }
+    const updatedUser = await User.findByIdAndUpdate(user.id, newUser, {new:true})
+
+    response.status(200).json({budget: updatedUser.budget})
 })
 
 
