@@ -43,7 +43,7 @@ usersRouter.post("/", async (request, response) => {
         request.session.tempId = user.id
         const token = jwt.sign({id: savedUser.id}, config.SECRET)
         nodemailer.sendConfirmationEmail(body.name,body.email,token)
-        response.json(token)
+        response.status(200).json({message: "Success"})
     } 
 })
 
@@ -82,6 +82,13 @@ usersRouter.get("/reSendSMS", async (request, response) => {
     const user = await User.findById(request.session.tempId)
     const SMStoken = speakeasy.totp({ secret: user.secret, encoding: "base32", step: 120})
     smsSend.sendConfirmSMS(user.number, SMStoken)
+    response.status(200).json({sent: true})
+})
+
+usersRouter.get("/reSendEmail", async (request, response) => {
+    const user = await User.findById(request.session.tempId)
+    const token = jwt.sign({id: request.session.tempId}, config.SECRET)
+    nodemailer.sendConfirmationEmail(user.name,user.email,token)
     response.status(200).json({sent: true})
 })
 
